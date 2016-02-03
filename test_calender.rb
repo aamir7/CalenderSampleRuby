@@ -5,14 +5,14 @@ require_relative "calender_controller.rb"
 
 class TestCalender
 
-	def initialize()
+	def initialize
 		@event_controller = EventController.instance
 		@person_controller = PersonController.instance
 		@calender_controller = CalenderController.instance
 	end
 	
-	def main()
-		while(true)
+	def main
+		loop do
 			print "\n----- ----- ----- ------\n" << "Please enter accordingly...\n"
 
 			print "1: Add a person\n"
@@ -23,22 +23,22 @@ class TestCalender
 			print "6: Cancel an event\n"
 			print "7: Exit\n"
 
-			input = gets
+			input = gets.chomp
 
-			case input.chomp!
+			case input
 
 			when "1"
-				@person_controller.add_person()
+				@person_controller.add_person
 			when "2"
-				@person_controller.display_persons()
+				@person_controller.display_persons
 			when "3"
-				@calender_controller.display_calender()
+				@calender_controller.display_calender
 			when "4"
-				@event_controller.add_event()
+				@event_controller.add_event
 			when "5"
-				@event_controller.display_event()
+				@event_controller.display_event
 			when "6"
-				@event_controller.cancel_event()
+				@event_controller.cancel_event
 			when "7"
 				break
 			else

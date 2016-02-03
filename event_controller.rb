@@ -2,6 +2,7 @@
 require 'singleton'
 require_relative "event.rb"
 require_relative "person_controller.rb"
+require_relative "event_person_controller.rb"
 
 class EventController
 	include Singleton
@@ -16,10 +17,7 @@ class EventController
 	end
 
 	def add_event
-		@event_id = @event_id + 1
-
 		event = Event.new
-		event.event_id = @event_id
 
 		loop do
 			puts "Enter event title!"
@@ -27,7 +25,7 @@ class EventController
 
 			if(title.empty?)
 				puts "Title can not be empty!!!"
-			elsif(check_event_exit(title).any?)
+			elsif(get_events_for_title(title).any?)
 				puts "Event for title already exist!!!"
 			else
 				event.event_title = title
@@ -51,18 +49,18 @@ class EventController
 		event.event_end_time = gets.chomp 
 
 		loop do
-			persons_exist = PersonController.instance.persons_exist?
+			persons_list_empty = PersonController.instance.persons_list_empty?
 			puts "Enter accordingly!"
-			puts "1: Existing person!" if persons_exist
+			puts "1: Existing person!" unless persons_list_empty
 			puts "2: Other person!"
 			puts "Any other key for continue!"
 
 			input = gets.chomp
 			
-			if input == "1" && persons_exist
-				PersonController.instance.addExistingPersonToEvent(@event_id)
+			if input == "1" && !persons_list_empty
+				EventPersonController.instance.add_existing_person_to_event(event.event_id)
 			elsif input == "2"
-				PersonController.instance.addNewPersonToEvent(@event_id)
+				EventPersonController.instance.add_new_person_to_event(event.event_id)
 			else
 				break
 			end
@@ -80,14 +78,14 @@ class EventController
 			puts "Enter event title!"
 			title = gets.chomp
 
-			events = check_event(title)
+			events = get_events_for_title(title)
 			if(events.any?)
 				events.each do |event|
 					@events_list.map! do |e|
 						e.event_status = EventStatus::CANCELLED if e.event_id == event.event_id
+						puts "Event cancelled!!!"
 						e #return itself
 					end
-					puts "Event is cancelled!!!"
 				end
 				break
 			else
@@ -102,19 +100,13 @@ class EventController
 		end
 	end
 
-	def check_event(title)
-		elem_arr = @events_list.select {|event| event.event_title == title}
-		elem_arr
-	end
-
 	private
 		def initialize
-			@event_id = 0
 			@events_list = []
 		end
 
-		def check_event_exit(title)
-			elem_arr = @events_list.select {|event| event.event_title == title}
-			elem_arr
+		def get_events_for_title(title)
+			events_list = @events_list.select {|event| event.event_title == title}
+			events_list
 		end
 end
